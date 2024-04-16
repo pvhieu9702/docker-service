@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  minio:
+    container_name: ${COMPOSE_PROJECT_NAME}-minio
+    build:
+      context: ./minio
+      dockerfile: Dockerfile
+    ports:
+      - ${MINIO_UI_PORT}:9000
+      - ${MINIO_SERVICE_PORT}:8900
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_REGION_NAME: ${MINIO_REGION_NAME}
+      MINIO_API_CORS_ALLOW_ORIGIN: ${MINIO_API_CORS_ALLOW_ORIGIN}
+      MINIO_DOMAIN: ${MINIO_DOMAIN}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+    volumes:
+      - minio:/data/minio
+    command: minio server /data/minio --console-address ":8900"
+  mail:
+    container_name: ${COMPOSE_PROJECT_NAME}-mail
+    build:
+      context: ./mail
+      dockerfile: Dockerfile
+    ports:
+    - ${MAILHOG_SERVICE_PORT}:1025
+    - ${MAILHOG_UI_PORT}:8025
+    environment:
+      MH_STORAGE: maildir
+      MH_MAILDIR_PATH: /tmp
+    volumes:
+      - mail_hog:/tmp
+
+volumes:
+  minio:
+  mail_hog:
